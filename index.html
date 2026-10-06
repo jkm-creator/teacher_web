@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1학년 영어 — 어법 판단 학습</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Malgun Gothic',sans-serif; background:#f0f4f8; color:#2b3a4a; line-height:1.7; }
+  header { background:linear-gradient(135deg,#1e6fb8,#3fa7d6); color:#fff; padding:36px 20px; text-align:center; }
+  header h1 { font-size:30px; margin-bottom:8px; }
+  header p { font-size:15px; opacity:.9; }
+  main { max-width:860px; margin:30px auto; padding:0 16px 60px; }
+  section { background:#fff; border-radius:12px; padding:26px 28px; margin-bottom:24px; box-shadow:0 3px 10px rgba(0,0,0,.07); }
+  h2 { color:#1e6fb8; font-size:19px; margin-bottom:14px; border-left:5px solid #3fa7d6; padding-left:10px; }
+  .passage p { margin-bottom:12px; font-size:16px; text-align:justify; }
+  .q { border-top:1px dashed #dfe7ee; padding:16px 0; }
+  .q:first-of-type { border-top:none; }
+  .q .sentence { font-size:16px; background:#f7fafd; border-left:4px solid #bcd9ef; padding:10px 14px; border-radius:6px; margin-bottom:10px; }
+  .q .sentence u { text-decoration-color:#e07b39; text-decoration-thickness:2px; }
+  .q p.inst { font-size:14px; color:#5b6b7a; margin-bottom:10px; }
+  .btn { border:none; border-radius:8px; padding:8px 22px; font-size:15px; cursor:pointer; margin-right:8px; font-weight:bold; transition:.2s; }
+  .ox-o { background:#e3f3e8; color:#1d7a3f; }
+  .ox-x { background:#fbe6e6; color:#c0392b; }
+  .btn:hover { transform:translateY(-2px); box-shadow:0 3px 8px rgba(0,0,0,.15); }
+  .feedback { margin-top:10px; padding:10px 14px; border-radius:8px; font-size:14px; display:none; }
+  .correct { background:#e3f3e8; color:#1d7a3f; }
+  .wrong { background:#fbe6e6; color:#c0392b; }
+  #scoreBox { text-align:center; font-size:18px; font-weight:bold; color:#1e6fb8; }
+  #resetBtn { display:block; margin:14px auto 0; background:#1e6fb8; color:#fff; border:none; border-radius:8px; padding:10px 28px; font-size:15px; cursor:pointer; }
+  .mark { font-weight:bold; }
+</style>
+</head>
+<body>
+<header>
+  <h1>1학년 영어 학습 — 어법 판단</h1>
+  <p>본문을 읽고, 각 문장의 어법이 맞으면 O, 틀리면 X를 고르시오.</p>
+</header>
+<main>
+  <section class="passage">
+    <h2>📄 본문 (Reading)</h2>
+    <p>When Paul Dver was a high school student, he met comedian Soupy Sales and became friends with him. He even occasionally talked to the comedian on the telephone. Paul would tell his fellow high school students that he was friends with Soupy Sales, and of course they didn’t believe him. One day, he asked Soupy for a favor. Paul and his friends were appearing in a play, and he asked Soupy to record an advertisement for him because if it were recorded in Soupy’s voice, the local radio station would play it. Soupy did more than just record the advertisement as written. He threw in some ad-libs and made it funny. Of course, Paul’s high school friends were amazed to hear Soupy’s voice on the radio advertising Paul and his friends’ play.</p>
+  </section>
+
+  <section id="quiz">
+    <h2>✏️ 어법 판단 문제</h2>
+    <div id="questions"></div>
+    <div id="scoreBox">점수: <span id="score">0</span> / 10</div>
+    <button id="resetBtn" onclick="resetQuiz()">다시 풀기</button>
+  </section>
+</main>
+
+<script>
+const QUESTIONS = [
+  { s: "He even occasionally <u>talked</u> to the comedian on the telephone.", a: "O", e: "occasionally(때때로)는 빈도부사로 일반동사 앞·be동사 뒤에 와요. talk의 과거형도 맞습니다." },
+  { s: "...they <u>doesn't</u> believe him.", a: "X", e: "주어가 they(복수)이므로 don't가 되어야 합니다. doesn't는 3인칭 단수 주어에 씁니다." },
+  { s: "Paul and his friends <u>was</u> appearing in a play.", a: "X", e: "주어가 Paul and his friends(복수)이므로 were가 되어야 합니다. (were appearing)" },
+  { s: "...he asked Soupy <u>to record</u> an advertisement for him.", a: "O", e: "ask + 목적어 + to부정사 구조로 맞습니다." },
+  { s: "...if it <u>were</u> recorded in Soupy's voice, the local radio station would play it.", a: "O", e: "현재 사실에 대한 가정이므로 가정법 과거 — if절에 과거형 were를 쓴 것이 맞습니다." },
+  { s: "Soupy did more than just <u>to record</u> the advertisement as written.", a: "X", e: "do more than + 동사원형 → record가 되어야 합니다." },
+  { s: "He threw in some ad-libs and <u>made</u> it funny.", a: "O", e: "make + it + 형용사(목적격 보어) 구조로 맞습니다." },
+  { s: "...Paul's friends were <u>amazing</u> to hear Soupy's voice on the radio.", a: "X", e: "사람이 감정을 느끼므로 과거분사 amazed가 맞습니다. amazing은 대상이 감정을 일으킬 때 씁니다." },
+  { s: "...advertising Paul and his friends' <u>play</u>.", a: "O", e: "play가 '(연극) 작품'이라는 명사로 쓰여 문맥에 맞습니다." },
+  { s: "Of course, Paul's high school friends <u>were amazed</u> to hear Soupy's voice.", a: "O", e: "be amazed to부정사: ~해서 놀랐다. 어법상 맞습니다." }
+];
+let score = 0, answered = 0;
+const box = document.getElementById('questions');
+QUESTIONS.forEach((q,i) => {
+  const d = document.createElement('div');
+  d.className = 'q';
+  d.innerHTML = `<p class="inst">Q${i+1}. 어법상 올바르면 O, 틀리면 X를 고르시오.</p>
+    <div class="sentence">${q.s}</div>
+    <button class="btn ox-o" onclick="check(${i},'O',this)">O</button>
+    <button class="btn ox-x" onclick="check(${i},'X',this)">X</button>
+    <div class="feedback" id="fb${i}"></div>`;
+  box.appendChild(d);
+});
+function check(i, ans, btn) {
+  const fb = document.getElementById('fb'+i);
+  if (fb.dataset.done) return;
+  fb.dataset.done = '1';
+  const q = QUESTIONS[i];
+  const correct = ans === q.a;
+  if (correct) { score++; document.getElementById('score').textContent = score; }
+  fb.className = 'feedback ' + (correct ? 'correct' : 'wrong');
+  fb.innerHTML = `<span class="mark">${correct ? '⭕ 정답!' : '❌ 오답! 정답은 ' + q.a + '입니다.'}</span><br>💡 ${q.e}`;
+  fb.style.display = 'block';
+  btn.parentElement.querySelectorAll('.btn').forEach(b => b.disabled = true);
+}
+function resetQuiz() { location.reload(); }
+</script>
+</body>
+</html>
